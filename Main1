@@ -1,0 +1,135 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class Main1 {
+
+	public static void main(String[] args) {
+
+		long startTime = System.currentTimeMillis();
+
+		Random rn = new Random();
+
+		// Coordinations of queens in the chess board
+		ArrayList<Coordinate> coordinates = new ArrayList<Coordinate>();
+
+		// Boolean variable that checks whether the goal state is achieved or not
+		boolean conditionSatisfied = false;
+
+		// Number of relocate operations of queens whose positions are incompatible with
+		// goal state
+
+		int numberOfRelocations = 0;
+
+		/*
+		 * Number of restart operations when the goal state could not be achieved after
+		 * relocations It starts from -1, since first creations of coordinates of queens
+		 * should not be count as random restart
+		 */
+		int numberOfRandomRestart = -1;
+
+		while (!conditionSatisfied) {
+			coordinates.clear(); // Clear operation of coordinates
+			numberOfRandomRestart++;
+
+			// Creating 8 queens on board or restart operation as well
+			for (int i = 0; i < 8; i++) {
+				coordinates.add(new Coordinate(i, rn.nextInt(8)));
+			}
+
+			// Checking the states of queens for relocation operations
+			for (Coordinate c : coordinates) {
+				int count = 0;
+				while (isCoordinationOverlap(c, coordinates) && count < 8) {
+					c.setY(((c.getY() + 1) % 8));
+					numberOfRelocations++;
+					count++;
+				}
+
+				/*
+				 * If the related queen has been relocated for 8 times(count==8) and still
+				 * incompatible with goal state, the for loop should be exited and random
+				 * restart operation should be executed
+				 */
+				if (count == 8) {
+					break;
+				}
+			}
+			// If condition checks whether the board has achieved the goal state or not
+			if (isBoardSatisfied(coordinates)) {
+				conditionSatisfied = true;
+			}
+
+		}
+
+		print(coordinates);
+		System.out.println();
+		System.out.println("Number of relocations: " + numberOfRelocations);
+		System.out.println();
+		System.out.println("Number of random restarts: " + numberOfRandomRestart);
+		System.out.println();
+		long endTime = System.currentTimeMillis();
+		float elapsedTime = endTime - startTime;
+		System.out.println("The program executed in: " + elapsedTime + " milliseconds");
+	}
+
+	// The method which checks whether the board has achieved the goal state or not
+	public static boolean isBoardSatisfied(ArrayList<Coordinate> coordinates) {
+		int length = coordinates.size();
+
+		for (int i = 0; i < length - 1; i++) {
+			for (int j = i + 1; j < length; j++) {
+				if (coordinates.get(i).getX() == coordinates.get(j).getX()
+						|| coordinates.get(i).getY() == coordinates.get(j).getY()
+						|| Math.abs(coordinates.get(i).getX() - (coordinates.get(j).getX())) == Math
+								.abs(coordinates.get(i).getY() - coordinates.get(j).getY())) {
+					return false;
+
+				}
+			}
+		}
+
+		return true;
+	}
+
+	// The method which checks whether the related coordinate is compatible with the
+	// goal state or not
+	public static boolean isCoordinationOverlap(Coordinate c, ArrayList<Coordinate> coordinates) {
+
+		for (Coordinate c2 : coordinates) {
+			if (c2.getX() != c.getX() && c2.getY() != c.getY()) {
+				if (c2.getX() == c.getX() || c2.getY() == c.getY()
+						|| Math.abs(c2.getX() - (c.getX())) == Math.abs(c2.getY() - c.getY())) {
+					return true;
+				}
+
+			}
+		}
+
+		return false;
+	}
+
+	// The method which printss the final position of chess board
+	public static void print(ArrayList<Coordinate> coordinates) {
+		char[][] chessBoard = new char[8][8];
+
+		for (Coordinate c : coordinates) {
+			chessBoard[c.getX()][c.getY()] = 'X';
+		}
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				if (chessBoard[i][j] != 'X') {
+					chessBoard[i][j] = 'O';
+				}
+			}
+		}
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				System.out.print(chessBoard[i][j]);
+			}
+			System.out.println();
+		}
+
+	}
+
+}
